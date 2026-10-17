@@ -61,7 +61,7 @@ void* malloc(size_t s)
 			ctx.magic = get_random_secret();
 			ctx.brk   = syscall(SYS_brk,0);
 			
-			if(ctx.brk & ALIGN != ctx.brk) //mostly is aligned, but u never know..
+			if((ctx.brk & ALIGN) != ctx.brk) //mostly is aligned, but u never know..
 			{
 				ctx.brk = syscall(SYS_brk,ctx.brk&ALIGN);
 			}
@@ -99,7 +99,7 @@ void* malloc(size_t s)
 				cmt->allocatoffset=s;
 				cmt->lock = 0;
 				return  DATALOC(cmt);
-			}/*else if(cmt->datasize - cmt->allocatoffset >= s + sizeof(uintptr_t) && ~cmt->alocatedcount)
+			}else if(cmt->datasize - cmt->allocatoffset >= s + sizeof(uintptr_t) && ~cmt->alocatedcount)
 			{
 				*(void**)((uintptr_t)cmt + cmt->allocatoffset) = cmt;
 				void* ret = (void*)((uintptr_t)cmt + cmt->allocatoffset + sizeof(uintptr_t));
@@ -108,10 +108,10 @@ void* malloc(size_t s)
 				cmt->lock=0;
 				return ret;
 
-			}*/
-			nxtm = NXTCNK(cmt);
+			}
 			cmt->lock = 0;
 		}
+		nxtm = NXTCNK(cmt);
 		cmt = nxtm;
 		
 	}
